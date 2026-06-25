@@ -1,0 +1,24 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Banco de dados (gerado automaticamente)
+data/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variáveis de ambiente e chaves
+.env
+*.env
+
+# Configurações de editores
+.vscode/
+.idea/
+
+# Pytest
+.pytest_cache/

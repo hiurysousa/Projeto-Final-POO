@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concessionária & Locadora</title>
+<style>
+:root{
+  --bg:#1a1a2e;--surface:#16213e;--surface-2:#1f2a4d;
+  --primary:#0f3460;--primary-hover:#1a4a85;
+  --accent:#e94560;--accent-hover:#f25975;
+  --gold:#f5b841;--text:#e8ecf3;--muted:#8a93a8;
+  --border:#243056;--green:#22c55e;--red:#ef4444;--yellow:#eab308;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#11182f 0%,#0d1426 100%);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:grid;place-items:center;font-weight:700;color:#fff}
+.brand-title{font-weight:600;font-size:15px}
+.brand-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{background:none;border:none;color:var(--muted);text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;transition:.15s}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:var(--primary);color:#fff;font-weight:500}
+.sidebar-foot{font-size:11px;color:var(--muted);text-align:center}
+.main{padding:32px 40px;overflow:auto}
+.tab{display:none}.tab.active{display:block}
+.page-head{margin-bottom:24px}
+.page-head h1{font-size:24px;font-weight:600}
+.page-head p{color:var(--muted);font-size:13px;margin-top:2px}
+.page-head.row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.actions{display:flex;gap:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.card-value{font-size:32px;font-weight:600;margin-top:8px}
+.card-accent{border-left:3px solid var(--accent)}
+.card-green{border-left:3px solid var(--green)}
+.card-red{border-left:3px solid var(--red)}
+.card-yellow{border-left:3px solid var(--yellow)}
+.card-gold{border-left:3px solid var(--gold)}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:14px 18px;font-size:13px}
+thead{background:rgba(0,0,0,.2)}
+th{color:var(--muted);font-weight:500;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+tbody tr{border-top:1px solid var(--border)}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+.empty{padding:32px;text-align:center;color:var(--muted)}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.badge-green{background:rgba(34,197,94,.15);color:#4ade80}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171}
+.badge-yellow{background:rgba(234,179,8,.18);color:#facc15}
+.badge-blue{background:rgba(15,52,96,.4);color:#60a5fa}
+.badge-gold{background:rgba(245,184,65,.18);color:var(--gold)}
+.btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.15s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn.ghost:hover{color:var(--text)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal.open{display:flex}
+.modal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-head h2{font-size:17px;font-weight:600}
+.x{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1}
+.x:hover{color:var(--text)}
+.form{padding:24px;display:flex;flex-direction:column;gap:14px}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);font-weight:500}
+.form input,.form select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit}
+.form input:focus,.form select:focus{outline:none;border-color:var(--accent)}
+.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.info{background:var(--bg);padding:10px 14px;border-radius:8px;font-size:13px;color:var(--muted);border:1px solid var(--border)}
+.info strong{color:var(--gold);font-size:15px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.err{border-left:3px solid var(--red)}
+option:disabled{color:#555}
+@media(max-width:1024px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{flex-direction:row;align-items:center;padding:12px 16px;gap:16px}
+  .nav{flex-direction:row;overflow-x:auto}
+  .sidebar-foot{display:none}
+  .main{padding:20px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">CL</div>
+      <div>
+        <div class="brand-title">ConcessioPro</div>
+        <div class="brand-sub">Gestão de Frota</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-item" data-tab="veiculos">Veículos</button>
+      <button class="nav-item" data-tab="clientes">Clientes</button>
+      <button class="nav-item" data-tab="funcionarios">Funcionários</button>
+      <button class="nav-item" data-tab="transacoes">Transações</button>
+    </nav>
+    <div class="sidebar-foot">v2.0 · Flask API</div>
+  </aside>
+
+  <main class="main">
+    <section class="tab active" id="tab-dashboard">
+      <header class="page-head">
+        <h1>Dashboard</h1><p>Visão geral da operação</p>
+      </header>
+      <div class="cards">
+        <div class="card card-accent"><div class="card-label">Total de Veículos</div><div class="card-value" id="dash-total">—</div></div>
+        <div class="card card-green"><div class="card-label">Disponíveis</div><div class="card-value" id="dash-disp">—</div></div>
+        <div class="card card-red"><div class="card-label">Vendidos</div><div class="card-value" id="dash-vend">—</div></div>
+        <div class="card card-yellow"><div class="card-label">Alugados</div><div class="card-value" id="dash-alug">—</div></div>
+        <div class="card card-gold"><div class="card-label">Clientes</div><div class="card-value" id="dash-cli">—</div></div>
+        <div class="card card-gold"><div class="card-label">Funcionários</div><div class="card-value" id="dash-func">—</div></div>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-veiculos">
+      <header class="page-head row">
+        <div><h1>Veículos</h1><p>Frota cadastrada</p></div>
+        <button class="btn btn-accent" data-open="modal-veiculo">+ Cadastrar Veículo</button>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Marca/Modelo</th><th>Ano</th><th>Preço Base</th><th>Preço Final</th><th>Status</th></tr></thead>
+          <tbody id="tbody-veiculos"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-clientes">
+      <header class="page-head row">
+        <div><h1>Clientes</h1><p>Cadastro de clientes</p></div>
+        <button class="btn btn-accent" data-open="modal-cliente">+ Cadastrar Cliente</button>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th></tr></thead>
+          <tbody id="tbody-clientes"><tr><td colspan="3" class="empty">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-funcionarios">
+      <header class="page-head row">
+        <div><h1>Funcionários</h1><p>Equipe da concessionária</p></div>
+        <button class="btn btn-accent" data-open="modal-funcionario">+ Cadastrar Funcionário</button>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Salário</th></tr></thead>
+          <tbody id="tbody-funcionarios"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-transacoes">
+      <header class="page-head row">
+        <div><h1>Transações</h1><p>Vendas e aluguéis registrados</p></div>
+        <div class="actions">
+          <button class="btn btn-primary" data-open="modal-venda">Registrar Venda</button>
+          <button class="btn btn-accent" data-open="modal-aluguel">Registrar Aluguel</button>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Veículo</th><th>Cliente</th><th>Funcionário</th><th>Data</th><th>Valor</th></tr></thead>
+          <tbody id="tbody-transacoes"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal: Veículo -->
+<div class="modal" id="modal-veiculo">
+  <div class="modal-card">
+    <header class="modal-head"><h2>Cadastrar Veículo</h2><button class="x" data-close>&times;</button></header>
+    <div class="form">
+      <label>Tipo<select id="v-tipo"><option value="Carro">Carro</option><option value="Moto">Moto</option></select></label>
+      <label>Marca<input id="v-marca" /></label>
+      <label>Modelo<input id="v-modelo" /></label>
+      <label>Ano<input id="v-ano" type="number" min="1950" max="2030" /></label>
+      <label>Preço Base (R$)<input id="v-preco" type="number" step="0.01" min="0" /></label>
+      <label id="label-combustivel">Combustível
+        <select id="v-combustivel"><option>Gasolina</option><option>Etanol</option><option>Flex</option><option>Diesel</option><option>Elétrico</option></select>
+      </label>
+      <div class="form-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button class="btn btn-accent" id="btn-salvar-veiculo">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cliente -->
+<div class="modal" id="modal-cliente">
+  <div class="modal-card">
+    <header class="modal-head"><h2>Cadastrar Cliente</h2><button class="x" data-close>&times;</button></header>
+    <div class="form">
+      <label>Nome<input id="c-nome" /></label>
+      <label>CPF<input id="c-cpf" /></label>
+      <label>Telefone<input id="c-telefone" /></label>
+      <div class="form-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button class="btn btn-accent" id="btn-salvar-cliente">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Funcionário -->
+<div class="modal" id="modal-funcionario">
+  <div class="modal-card">
+    <header class="modal-head"><h2>Cadastrar Funcionário</h2><button class="x" data-close>&times;</button></header>
+    <div class="form">
+      <label>Nome<input id="f-nome" /></label>
+      <label>CPF<input id="f-cpf" /></label>
+      <label>Telefone<input id="f-telefone" /></label>
+      <label>Cargo<input id="f-cargo" /></label>
+      <label>Salário (R$)<input id="f-salario" type="number" step="0.01" min="0" /></label>
+      <div class="form-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button class="btn btn-accent" id="btn-salvar-funcionario">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Venda -->
+<div class="modal" id="modal-venda">
+  <div class="modal-card">
+    <header class="modal-head"><h2>Registrar Venda</h2><button class="x" data-close>&times;</button></header>
+    <div class="form">
+      <label>Veículo<select id="venda-veiculo"></select></label>
+      <label>Cliente<select id="venda-cliente"></select></label>
+      <label>Funcionário<select id="venda-funcionario"></select></label>
+      <div class="info">Valor final: <strong id="venda-valor">R$ 0,00</strong></div>
+      <div class="form-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirmar-venda">Concluir Venda</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Aluguel -->
+<div class="modal" id="modal-aluguel">
+  <div class="modal-card">
+    <header class="modal-head"><h2>Registrar Aluguel</h2><button class="x" data-close>&times;</button></header>
+    <div class="form">
+      <label>Veículo<select id="aluguel-veiculo"></select></label>
+      <label>Cliente<select id="aluguel-cliente"></select></label>
+      <label>Funcionário<select id="aluguel-funcionario"></select></label>
+      <label>Dias de locação<input id="aluguel-dias" type="number" min="1" value="1" /></label>
+      <div class="info">Diária (2% do preço base): <strong id="aluguel-diaria">R$ 0,00</strong></div>
+      <div class="info">Valor total: <strong id="aluguel-total">R$ 0,00</strong></div>
+      <div class="form-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button class="btn btn-accent" id="btn-confirmar-aluguel">Concluir Aluguel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let veiculos=[], clientes=[], funcionarios=[], transacoes=[];
+
+const fmtBRL  = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const fmtDate = d => new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const byId    = (arr,id) => arr.find(x=>x.id===Number(id));
+
+function statusBadge(s){
+  const cls=s==='Disponível'?'badge-green':s==='Vendido'?'badge-red':'badge-yellow';
+  return `<span class="badge ${cls}">${s}</span>`;
+}
+
+function toast(msg,tipo='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast ${tipo} show`;
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+async function api(path,options={}){
+  const res=await fetch(API+path,{headers:{'Content-Type':'application/json'},...options});
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.erro||'Erro desconhecido');
+  return data;
+}
+
+async function carregarTudo(){
+  try{
+    [veiculos,clientes,funcionarios,transacoes]=await Promise.all([
+      api('/veiculos'),api('/clientes'),api('/funcionarios'),api('/transacoes')
+    ]);
+    renderTudo();
+  }catch(e){
+    toast('Não foi possível conectar à API. Verifique se api.py está rodando.','err');
+  }
+}
+
+async function renderDashboard(){
+  try{
+    const d=await api('/dashboard');
+    document.getElementById('dash-total').textContent=d.total_veiculos;
+    document.getElementById('dash-disp').textContent=d.disponiveis;
+    document.getElementById('dash-vend').textContent=d.vendidos;
+    document.getElementById('dash-alug').textContent=d.alugados;
+    document.getElementById('dash-cli').textContent=d.total_clientes;
+    document.getElementById('dash-func').textContent=d.total_funcionarios;
+  }catch(e){document.getElementById('dash-total').textContent='!';}
+}
+
+function renderVeiculos(){
+  const tb=document.getElementById('tbody-veiculos');
+  if(!veiculos.length){tb.innerHTML='<tr><td colspan="6" class="empty">Nenhum veículo cadastrado</td></tr>';return;}
+  tb.innerHTML=veiculos.map(v=>`<tr>
+    <td><span class="badge ${v.tipo==='Carro'?'badge-blue':'badge-gold'}">${v.tipo}</span></td>
+    <td>${v.marca} ${v.modelo}${v.tipo_combustivel?` <span style="color:var(--muted);font-size:11px">· ${v.tipo_combustivel}</span>`:''}</td>
+    <td>${v.ano}</td><td>${fmtBRL(v.preco_base)}</td><td>${fmtBRL(v.preco_final)}</td><td>${statusBadge(v.status)}</td>
+  </tr>`).join('');
+}
+
+function renderClientes(){
+  const tb=document.getElementById('tbody-clientes');
+  if(!clientes.length){tb.innerHTML='<tr><td colspan="3" class="empty">Nenhum cliente cadastrado</td></tr>';return;}
+  tb.innerHTML=clientes.map(c=>`<tr><td>${c.nome}</td><td>${c.cpf}</td><td>${c.telefone}</td></tr>`).join('');
+}
+
+function renderFuncionarios(){
+  const tb=document.getElementById('tbody-funcionarios');
+  if(!funcionarios.length){tb.innerHTML='<tr><td colspan="4" class="empty">Nenhum funcionário cadastrado</td></tr>';return;}
+  tb.innerHTML=funcionarios.map(f=>`<tr><td>${f.nome}</td><td>${f.cpf}</td><td>${f.cargo}</td><td>${fmtBRL(f.salario)}</td></tr>`).join('');
+}
+
+function renderTransacoes(){
+  const tb=document.getElementById('tbody-transacoes');
+  if(!transacoes.length){tb.innerHTML='<tr><td colspan="6" class="empty">Nenhuma transação registrada</td></tr>';return;}
+  tb.innerHTML=transacoes.map(t=>{
+    const v=byId(veiculos,t.id_veiculo),c=byId(clientes,t.id_cliente),f=byId(funcionarios,t.id_funcionario);
+    return `<tr>
+      <td><span class="badge ${t.tipo_transacao==='Venda'?'badge-red':'badge-yellow'}">${t.tipo_transacao}</span></td>
+      <td>${v?v.marca+' '+v.modelo:'—'}</td><td>${c?c.nome:'—'}</td><td>${f?f.nome:'—'}</td>
+      <td>${fmtDate(t.data_transacao)}</td>
+      <td>${fmtBRL(t.valor_total)}${t.dias_locacao?` <span style="color:var(--muted);font-size:11px">(${t.dias_locacao}d)</span>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTudo(){
+  renderDashboard();renderVeiculos();renderClientes();renderFuncionarios();renderTransacoes();popularSelectsTransacao();
+}
+
+// Navegação
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Modais
+document.querySelectorAll('[data-open]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const id=b.dataset.open;
+    if(id==='modal-venda'||id==='modal-aluguel') popularSelectsTransacao();
+    document.getElementById(id).classList.add('open');
+  });
+});
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.addEventListener('click',()=>b.closest('.modal').classList.remove('open'));
+});
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+document.getElementById('v-tipo').addEventListener('change',e=>{
+  document.getElementById('label-combustivel').style.display=e.target.value==='Carro'?'flex':'none';
+});
+
+// Salvar veículo
+document.getElementById('btn-salvar-veiculo').addEventListener('click',async()=>{
+  const tipo=document.getElementById('v-tipo').value;
+  const marca=document.getElementById('v-marca').value.trim();
+  const modelo=document.getElementById('v-modelo').value.trim();
+  const ano=document.getElementById('v-ano').value;
+  const preco=document.getElementById('v-preco').value;
+  const comb=document.getElementById('v-combustivel').value;
+  if(!marca||!modelo||!ano||!preco){toast('Preencha todos os campos','err');return;}
+  try{
+    await api('/veiculos',{method:'POST',body:JSON.stringify({tipo,marca,modelo,ano,preco_base:preco,tipo_combustivel:tipo==='Carro'?comb:null})});
+    document.getElementById('modal-veiculo').classList.remove('open');
+    ['v-marca','v-modelo','v-ano','v-preco'].forEach(id=>document.getElementById(id).value='');
+    toast('Veículo cadastrado!');await carregarTudo();
+  }catch(e){toast(e.message,'err');}
+});
+
+// Salvar cliente
+document.getElementById('btn-salvar-cliente').addEventListener('click',async()=>{
+  const nome=document.getElementById('c-nome').value.trim();
+  const cpf=document.getElementById('c-cpf').value.trim();
+  const telefone=document.getElementById('c-telefone').value.trim();
+  if(!nome||!cpf||!telefone){toast('Preencha todos os campos','err');return;}
+  try{
+    await api('/clientes',{method:'POST',body:JSON.stringify({nome,cpf,telefone})});
+    document.getElementById('modal-cliente').classList.remove('open');
+    ['c-nome','c-cpf','c-telefone'].forEach(id=>document.getElementById(id).value='');
+    toast('Cliente cadastrado!');await carregarTudo();
+  }catch(e){toast(e.message,'err');}
+});
+
+// Salvar funcionário
+document.getElementById('btn-salvar-funcionario').addEventListener('click',async()=>{
+  const nome=document.getElementById('f-nome').value.trim();
+  const cpf=document.getElementById('f-cpf').value.trim();
+  const telefone=document.getElementById('f-telefone').value.trim();
+  const cargo=document.getElementById('f-cargo').value.trim();
+  const salario=document.getElementById('f-salario').value;
+  if(!nome||!cpf||!telefone||!cargo||!salario){toast('Preencha todos os campos','err');return;}
+  try{
+    await api('/funcionarios',{method:'POST',body:JSON.stringify({nome,cpf,telefone,cargo,salario})});
+    document.getElementById('modal-funcionario').classList.remove('open');
+    ['f-nome','f-cpf','f-telefone','f-cargo','f-salario'].forEach(id=>document.getElementById(id).value='');
+    toast('Funcionário cadastrado!');await carregarTudo();
+  }catch(e){toast(e.message,'err');}
+});
+
+// Selects de transação
+function popularSelectsTransacao(){
+  const disponiveis=veiculos.filter(v=>v.status==='Disponível');
+  ['venda','aluguel'].forEach(prefix=>{
+    const ve=document.getElementById(`${prefix}-veiculo`);
+    const cl=document.getElementById(`${prefix}-cliente`);
+    const fu=document.getElementById(`${prefix}-funcionario`);
+    if(!ve)return;
+    ve.innerHTML='<option value="">Selecione...</option>'+disponiveis.map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} (${v.ano})</option>`).join('');
+    cl.innerHTML='<option value="">Selecione...</option>'+clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+    fu.innerHTML='<option value="">Selecione...</option>'+funcionarios.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
+  });
+  atualizarVenda();atualizarAluguel();
+}
+
+function atualizarVenda(){
+  const v=byId(veiculos,document.getElementById('venda-veiculo').value);
+  document.getElementById('venda-valor').textContent=v?fmtBRL(v.preco_final):'R$ 0,00';
+}
+function atualizarAluguel(){
+  const v=byId(veiculos,document.getElementById('aluguel-veiculo').value);
+  const dias=Number(document.getElementById('aluguel-dias').value)||0;
+  const diaria=v?v.preco_base*0.02:0;
+  document.getElementById('aluguel-diaria').textContent=fmtBRL(diaria);
+  document.getElementById('aluguel-total').textContent=fmtBRL(diaria*dias);
+}
+
+document.getElementById('venda-veiculo').addEventListener('change',atualizarVenda);
+document.getElementById('aluguel-veiculo').addEventListener('change',atualizarAluguel);
+document.getElementById('aluguel-dias').addEventListener('input',atualizarAluguel);
+
+// Confirmar venda
+document.getElementById('btn-confirmar-venda').addEventListener('click',async()=>{
+  const veiculo_id=document.getElementById('venda-veiculo').value;
+  const cliente_id=document.getElementById('venda-cliente').value;
+  const funcionario_id=document.getElementById('venda-funcionario').value;
+  if(!veiculo_id||!cliente_id||!funcionario_id){toast('Selecione todos os campos','err');return;}
+  try{
+    const res=await api('/transacoes/venda',{method:'POST',body:JSON.stringify({veiculo_id,cliente_id,funcionario_id})});
+    document.getElementById('modal-venda').classList.remove('open');
+    toast(`Venda registrada! Valor: ${fmtBRL(res.valor_total)}`);await carregarTudo();
+  }catch(e){toast(e.message,'err');}
+});
+
+// Confirmar aluguel
+document.getElementById('btn-confirmar-aluguel').addEventListener('click',async()=>{
+  const veiculo_id=document.getElementById('aluguel-veiculo').value;
+  const cliente_id=document.getElementById('aluguel-cliente').value;
+  const funcionario_id=document.getElementById('aluguel-funcionario').value;
+  const dias=document.getElementById('aluguel-dias').value;
+  if(!veiculo_id||!cliente_id||!funcionario_id||!dias){toast('Preencha todos os campos','err');return;}
+  try{
+    const res=await api('/transacoes/aluguel',{method:'POST',body:JSON.stringify({veiculo_id,cliente_id,funcionario_id,dias})});
+    document.getElementById('modal-aluguel').classList.remove('open');
+    document.getElementById('aluguel-dias').value=1;
+    toast(`Aluguel registrado! Total: ${fmtBRL(res.valor_total)}`);await carregarTudo();
+  }catch(e){toast(e.message,'err');}
+});
+
+carregarTudo();
+</script>
+</body>
+</html>
