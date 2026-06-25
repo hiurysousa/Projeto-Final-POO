@@ -243,4 +243,4 @@ Para ativar, basta configurar a variável de ambiente da API escolhida e injetar
 
 ## Autor
 
-Desenvolvido por **Hiury** — IFCE, Disciplina de Programação Orientada a Objetos, 2025.
+Desenvolvido por **Hiury** — IFCE, Disciplina de Programação Orientada a Objetos, 2026.
